@@ -17,6 +17,8 @@ var packageArray = urls.reduce(function (newArray, url) {
     return newArray;
 }, []);
 
+
+
 // console.log(packageArray);
 
 // function printToConsole() {
@@ -39,44 +41,41 @@ var packageArray = urls.reduce(function (newArray, url) {
 // }
 
 function uploadResults(url, body) {
-    packageArray.findIndex(
+    var index = packageArray.findIndex(function (arrayItem) {
+        return arrayItem.url == url;
+    });
 
-        //Need to find the index of the array at the given url, then use that index to modify the 
-        //body and the ready status.  Once those have been modified, the forEach methods should work appropriately.
+    packageArray[index].body = body;
+    packageArray[index].ready = true;
+    var readyToPrint = true;
 
-
-        [url].body = body; packageArray[url].ready = true; console.log("we are alive"); console.log(packageArray);
-        var readyToPrint = true;
-
-        packageArray.forEach((package) => {
-            console.log("we are in");
-            console.log(package.ready);
-            if (package.ready === false) {
-                readyToPrint = false;
-            }
-        });
-
-        if (readyToPrint) {
-            packageArray.forEach((package) => {
-                console.log(package.body);
-            });
+    packageArray.forEach((package) => {
+        if (package.ready === false) {
+            readyToPrint = false;
         }
+    });
 
+    if (readyToPrint) {
+        packageArray.forEach((package) => {
+            console.log(package.body);
+        });
     }
 
-    // packageArray.forEach(function (package) {
+}
 
-    urls.forEach(function (url) {
-        http.get(url, function (res) {
-            res.setEncoding('utf8');
-            var body = '';
-            res.on('data', function (data) {
-                body += data;
-            });
+// packageArray.forEach(function (package) {
 
-            res.on('end', () => uploadResults(url, body));
-            res.on('error', console.error);
-
+urls.forEach(function (url) {
+    http.get(url, function (res) {
+        res.setEncoding('utf8');
+        var body = '';
+        res.on('data', function (data) {
+            body += data;
         });
+
+        res.on('end', () => uploadResults(url, body));
+        res.on('error', console.error);
+
     });
-    // });
+});
+// });
